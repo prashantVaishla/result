@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Info Edge Ltd.</title>
+
+<!-- dependencies for data table-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css">
+
+<script src="js/jquery-1.12.4.js"></script>
+<script src="js/dataTables.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+
+
+<!-- for model of bootstrap -->
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	   $('#example').dataTable({
+		  "processing": true,
+		  "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+		  
+           "columns": [
+						{ "title": "ITEM_ID","mDataProp": "itemID" },
+						{ "title": "ITEM_NAME","mDataProp": "itemName" },
+                        { "title": "SUPPLIER_ID","mDataProp": "supplierId" },
+                        { "title": "SUPPLIER_NAME","mDataProp": "supplierName" },
+                        { "title": "QTY","mDataProp": "qty" }
+                        
+           ],
+					"iDisplayLength": 10,
+                   "bLengthChange": false,
+					"oLanguage":{
+								"sProcessing":"Processing..",
+								
+								"sZeroRecords":"No record found",
+								},
+								"dom": 'Bfrtip',
+								"buttons": [
+								            'copy', 'csv', 'excel', 'pdf', 'print'
+								        ]
+   });
+
+	$("#btnSubmit").click(function(){
+		$.ajax({
+            type: "GET",
+            url: '/result/jsonData',
+            cache: false,
+            contentType: 'application/json',
+            datatype: 'json',
+            success: function (response,msg) {
+					var table = $('#example').DataTable();
+								table.clear();
+								table.rows.add(response);
+								table.draw();
+		
+            },
+            error: function () {
+                alert("ajax error occured");
+				$.fn.dataTable.ext.errMode = 'none';
+				$('#example')
+					.on( 'error.dt', function ( e, settings, techNote, message ) {
+					console.log( 'An error has been reported by DataTables: ', message );
+				} )
+					.DataTable();
+                //type error code here
+            }
+        });
+
+	});
+	
+	<!--function for model button submit to add supplier-->
+	 $("#addSupplier").click(function(event){
+	event.preventDefault();
+	var itemId=$("#itemId").val();
+	var itemName=$("#itemName").val();
+	console.log("check");
+	$.ajax({
+		type:"GET",
+		url:"/result/addSupplierPurchase",
+		data:{"itemID":itemId,"ItemName":itemName,"supplierId":"111","supplierName":"ram","Qty":12.0},
+			cache: false,
+            contentType: 'application/json',
+            datatype: 'json',
+            success: function (response,msg) {
+				console.log("logging"+msg);
+            },
+            error: function () {
+                alert("ajax error occured");
+				
+            }
+	});
+}); 
+	
+	
+    
+} );
+
+
+</script>
+</head>
+<body>
+
+  <div class="container">
+  <h1 class="modal-title">Purchase Details from Suppliers</h1>
+  </br>
+ <input id="btnSubmit" type="submit" value="Refresh">
+<table id="example" class="display" cellspacing="0" width="60%">
+        <thead>
+            <tr>
+                <th></th>
+                <th>ITEM_ID</th>
+                <th>ITEM_NAME</th>
+                <th>SUPPLIER_ID</th>
+                <th>SUPPLIER_NAME</th>
+                 
+                
+            </tr>
+        </thead>
+    </table>
+  </br>
+  
+  <!-- Trigger the modal with a button -->
+  <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal">Add Supplier</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Modal Header</h4>
+        </div>
+        <div class="modal-body">
+          <p>Some text in the modal.</p>
+			   <form>
+				  <div class="form-group">
+				    <label >ITEM ID:</label>
+				    <input class="form-control" name="itemId" id="itemId">
+				  </div>
+				  <div class="form-group">
+				    <label>ITEM Name</label>
+				    <input class="form-control" name="itemName" id="itemName">
+				  </div>
+				  <div class="form-group">
+				    <label >Supplier ID:</label>
+				    <input class="form-control" name="supplierId" id="supplierId">
+				  </div>
+				  <div class="form-group">
+				    <label>Supplier Name:</label>
+				    <input class="form-control" name="supplierName" id="supplierName">
+				  </div>
+				  <div class="form-group">
+				    <label>Quantity</label>
+				    <input class="form-control" name="qty" id="qty">
+				  </div>
+				  <!-- <div class="checkbox">
+				    <label><input type="checkbox"> Remember me</label>
+				  </div> -->
+				  <button id="addSupplier" type="submit" class="btn btn-default">Submit</button>
+			</form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+  
+</body>
+</html>

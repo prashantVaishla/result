@@ -1,0 +1,46 @@
+ <!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel='stylesheet'href='css/googleapi.css'  type='text/css'>
+</head>
+
+<body>
+  <div class="container">
+  <div class="profile">
+    <button class="profile__avatar" id="toggleProfile">
+	<!--Image path of the user in src below-->
+     <img src="images/logo.jpg" alt="Avatar" /> 
+    </button>
+    
+    <form method="post" action="/result/authuser" name="credential">
+    <div class="profile__form">
+      <div class="profile__fields">
+        <div class="field">
+          <input type="text" id="username" name="username" class="input" required pattern=.*\S.* />
+          <label for="fieldUser" class="label">Username</label>
+        </div>
+        <div class="field">
+          <input type="password" id="pwd" name="pwd" class="input" required pattern=.*\S.* />
+          <label for="fieldPassword" class="label">Password</label>
+        </div>
+        <div class="profile__footer">
+          
+          <input id="btnSubmit" type="submit" value="login">
+          <a href="empformNew">new</a>
+        </div>
+      </div>
+     </div>
+     </form>
+  </div>
+</div>
+  
+    <script  src="js/index.js"></script>
+    <script src="js/jquery.js"></script>
+
+    
+
+</body>
+</html>
