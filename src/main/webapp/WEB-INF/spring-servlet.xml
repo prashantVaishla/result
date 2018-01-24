@@ -1,44 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>  
-<beans xmlns="http://www.springframework.org/schema/beans"  
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
-     
-    xmlns:context="http://www.springframework.org/schema/context"  
-    xmlns:mvc="http://www.springframework.org/schema/mvc"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
 http://www.springframework.org/schema/context  
 http://www.springframework.org/schema/context/spring-context-3.0.xsd
 http://www.springframework.org/schema/mvc
-http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"> 
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 
-<context:component-scan base-package="result"/>
+	<context:component-scan base-package="result" />
 
-<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-<property name="prefix" value="/WEB-INF/views/"></property>
-<property name="suffix" value=""></property>
-</bean>
-  
-<bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
-<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>  
-<property name="url" value="jdbc:mysql://localhost:3307/test"></property>  
-<property name="username" value="root"></property>  
-<property name="password" value="admin"></property>  
-</bean>  
-  
-<bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">  
-<property name="dataSource" ref="ds"></property>  
-</bean>
-<bean id="dao" class="dataaccesslayer.DataConn">
-<property name="template" ref="jt"></property>
-</bean>
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=""></property>
+	</bean>
+	 <bean id="viewResolver1" class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+        <property name="order" value="1"/>
+        <property name="basename" value="views"/>
+    </bean>
 
-   <mvc:resources mapping = "/views/**" location = "/WEB-INF/views/" />
-   <mvc:resources mapping = "/css/**" location = "/WEB-INF/css/" />
-   <mvc:resources mapping = "/js/**" location = "/WEB-INF/js/" />
-   <mvc:resources mapping = "/images/**" location = "/WEB-INF/images/" />
-   <mvc:annotation-driven/>
-   <mvc:default-servlet-handler/>
-   
-   <context:component-scan base-package="service" />
-   
+	<!-- <bean id="ds"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3307/test"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="admin"></property>
+	</bean>
+
+	<bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="ds"></property>
+	</bean>
+	<bean id="dao" class="dataaccesslayer.DataConn">
+		<property name="template" ref="jt"></property>
+	</bean> -->
+
+	<mvc:resources mapping="/views/**" location="/WEB-INF/views/" />
+	<mvc:resources mapping="/css/**" location="/WEB-INF/css/" />
+	<mvc:resources mapping="/js/**" location="/WEB-INF/js/" />
+	<mvc:resources mapping="/images/**" location="/WEB-INF/images/" />
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+	<context:component-scan base-package="service" />
+	<context:component-scan base-package="dataaccesslayer" />
+	<context:component-scan base-package="config" />
+
 </beans>
