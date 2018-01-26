@@ -2,11 +2,16 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Info Edge Ltd.</title>
+<title>Edge Ltd.</title>
 
 <!-- dependencies for data table-->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css">
+
+<!--data picker  -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script src="js/jquery-1.12.4.js"></script>
 <script src="js/dataTables.js"></script>
@@ -18,6 +23,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
 
+<!-- new features for data table-->
 
 <!-- for model of bootstrap -->
 
@@ -25,6 +31,12 @@
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	
+	/*date picker   */
+	$( function() {
+    $("#date").datepicker();
+  } );
+	/*ends  */
 	
 	   $('#example').dataTable({
 		  "processing": true,
@@ -35,7 +47,8 @@ $(document).ready(function() {
 						{ "title": "ITEM_NAME","mDataProp": "itemName" },
                         { "title": "SUPPLIER_ID","mDataProp": "supplierId" },
                         { "title": "SUPPLIER_NAME","mDataProp": "supplierName" },
-                        { "title": "QTY","mDataProp": "qty" }
+                        { "title": "QTY","mDataProp": "qty" },
+                        { "title": "PURCHASE_DATE","mDataProp": "date" }
                         
            ],
 					"iDisplayLength": 10,
@@ -47,11 +60,53 @@ $(document).ready(function() {
 								},
 								"dom": 'Bfrtip',
 								"buttons": [
+											
 								            'copy', 'csv', 'excel', 'pdf', 'print'
 								        ]
    });
+	   /*  check for select in data table*/
+	   var table = $('#example').DataTable();
+	   
+	   $('#example tbody').on( 'click', 'tr', function () {
+	        if ( $(this).hasClass('selected') ) {
+	            $(this).removeClass('selected');
+	        }
+	        else {
+	            table.$('tr.selected').removeClass('selected');
+	            $(this).addClass('selected');
+	            /* var d = table.row( this ).data();
+	            alert(d.itemID); */
+	        }
+	    } );
+	   /*  buttom to delete row from data table*/
+	   $('#delRowFromDatatable').click( function () {
+		   var d = table.row('.selected').data();
+           alert(d.itemID);
+	        table.row('.selected').remove().draw( false );
+	        
+	        $.ajax({
+	            type: "POST",
+	            url: '/result/deleteInventory',
+	            data:JSON.stringify({"itemID":d.itemID}),
+				cache: false,
+	            contentType: 'application/json',
+	            async:false,
+	            processData:false,
+	            success: function (response,msg) {
+					console.log("value deleted with response"+response);	
+			
+	            },
+	            error: function () {
+	                alert("ajax error occured");
+					
+	            }
+	        });
 
-	$("#btnSubmit").click(function(){
+	    } );
+
+	
+	
+	function refreshDataTable() {
 		$.ajax({
             type: "GET",
             url: '/result/jsonData',
@@ -76,27 +131,100 @@ $(document).ready(function() {
                 //type error code here
             }
         });
+	}
+	
+	function supplierDetailsDropDown(){
+		$.ajax({
+			type:"GET",
+			url:'/result/jsonSupplierDetails',
+			cache:false,
+			contentType:'application/json',
+			datatype:'json',
+			success:function(response,msg){
+				 
+				        // Remove current options
+				        $('#supplierName').html('');
+				        // Add the empty option with the empty message
+				        $('#supplierName').append('<option value="">' + "Select" + '</option>');
+				        // Check result isnt empty
+				        if(response != '')
+				        {
+				            // Loop through each of the results and append the option to the dropdown
+				            $.each(response, function(k, v) {
+				            	$('#supplierName').append('<option value="' + v.supplierId + '">' + v.supplierName + '</option>');
+				            });
+				        }
+			}
+		});
+	}
+	
+	$("#btnGetDataInTable").click(function(){
+		refreshDataTable();
+		
+		/* $.ajax({
+            type: "GET",
+            url: '/result/jsonData',
+            cache: false,
+            contentType: 'application/json',
+            datatype: 'json',
+            success: function (response,msg) {
+					var table = $('#example').DataTable();
+								table.clear();
+								table.rows.add(response);
+								table.draw();
+		
+            },
+            error: function () {
+                alert("ajax error occured");
+				$.fn.dataTable.ext.errMode = 'none';
+				$('#example')
+					.on( 'error.dt', function ( e, settings, techNote, message ) {
+					console.log( 'An error has been reported by DataTables: ', message );
+				} )
+					.DataTable();
+                //type error code here
+            }
+        }); */
 
+	});
+	$('#closeModelForAddItem').click(function(){
+		refreshDataTable();
+	});
+	
+	$('#addInventory').click(function(){
+		supplierDetailsDropDown();
 	});
 	
 	<!--function for model button submit to add supplier-->
 	 $("#addSupplier").click(function(event){
 	event.preventDefault();
-	var itemId=$("#itemId").val();
 	var itemName=$("#itemName").val();
+	var supplierId=$("#supplierId").val();
+	var supplierName=$("#supplierName").val();
+	var qty=$("#qty").val();
+	var date=$("#date").val();
 	console.log("check");
 	$.ajax({
-		type:"GET",
+		type:"POST",
 		url:"/result/addSupplierPurchase",
-		data:{"itemID":itemId,"ItemName":itemName,"supplierId":"111","supplierName":"ram","Qty":12.0},
+		data:JSON.stringify({"itemName":itemName,"supplierId":supplierId,"supplierName":supplierName,"qty":qty,"date":date}),
 			cache: false,
             contentType: 'application/json',
-            datatype: 'json',
+            //datatype: 'json',
+            async:false,
+            processData:false,
             success: function (response,msg) {
 				console.log("logging"+msg);
+				var itemId=$("#itemId").val("");
+				var itemName=$("#itemName").val("");
+				var supplierId=$("#supplierId").val("");
+				var supplierName=$("#supplierName").val("");
+				var qty=$("#qty").val("");
+				var date=$("#date").val("");
             },
-            error: function () {
-                alert("ajax error occured");
+            error: function (e, xhr, opt) {
+               // alert("ajax error occured");
+                alert("ajax error occured:Error requesting " + opt.url + ": " + xhr.status + " " + xhr.statusText);
 				
             }
 	});
@@ -114,8 +242,8 @@ $(document).ready(function() {
   <div class="container">
   <h1 class="modal-title">Purchase Details from Suppliers</h1>
   </br>
- <input id="btnSubmit" type="submit" value="Refresh">
-<table id="example" class="display" cellspacing="0" width="60%">
+ <input id="btnGetDataInTable" type="submit" value="Refresh">
+<table id="example" class="display" cellspacing="0" width="40%">
         <thead>
             <tr>
                 <th></th>
@@ -123,6 +251,7 @@ $(document).ready(function() {
                 <th>ITEM_NAME</th>
                 <th>SUPPLIER_ID</th>
                 <th>SUPPLIER_NAME</th>
+                 <th>QTY</th>
                  
                 
             </tr>
@@ -130,10 +259,12 @@ $(document).ready(function() {
     </table>
   </br>
   
-  <!-- Trigger the modal with a button -->
-  <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal">Add Supplier</button>
+  <!-- Trigger Modal 1 modal with a button -->
+  <button type="button" id="addInventory" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal">Add Inventory</button>
+  <!-- Trigger Modal 2  modal with a button -->
+  <button type="button" id="delRowFromDatatable" class="btn btn-info btn-sm">Detele</button>
 
-  <!-- Modal -->
+  <!-- Modal 1 add purchase details-->
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
     
@@ -147,24 +278,20 @@ $(document).ready(function() {
           <p>Some text in the modal.</p>
 			   <form>
 				  <div class="form-group">
-				    <label >ITEM ID:</label>
-				    <input class="form-control" name="itemId" id="itemId">
-				  </div>
-				  <div class="form-group">
 				    <label>ITEM Name</label>
 				    <input class="form-control" name="itemName" id="itemName">
 				  </div>
 				  <div class="form-group">
-				    <label >Supplier ID:</label>
-				    <input class="form-control" name="supplierId" id="supplierId">
-				  </div>
-				  <div class="form-group">
-				    <label>Supplier Name:</label>
-				    <input class="form-control" name="supplierName" id="supplierName">
+				    <label>Supplier Name</label>
+				    <select class="form-control" name="supplierName" id="supplierName"></select>
 				  </div>
 				  <div class="form-group">
 				    <label>Quantity</label>
 				    <input class="form-control" name="qty" id="qty">
+				  </div>
+				  <div class="form-group">
+				    <label>Purchase Date</label>
+				    <input class="form-control" name="date" id="date">
 				  </div>
 				  <!-- <div class="checkbox">
 				    <label><input type="checkbox"> Remember me</label>
@@ -173,13 +300,60 @@ $(document).ready(function() {
 			</form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button id="closeModelForAddItem"type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
+        
       </div>
       
     </div>
   </div>
-  
+
+
+<!-- Modal 2 delete purchase details-->  
+
+ <!-- <div class="modal fade" id="delModal" role="dialog">
+    <div class="modal-dialog">
+    
+      Modal content
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Delete details</h4>
+        </div>
+        <div class="modal-body">
+          <p>Pelease select Details.</p>
+			   <form>
+				  <div class="checkbox-inline">
+				    <label ><input type="checkbox" name="itemIdChk" value="itemIdChk" value="itemId">ITEM ID:</label>
+				    
+				  </div>
+				  <div class="checkbox-inline">
+				    <label><input type="checkbox" name="itemNameChk" id="itemNameChk" value="itemName">ITEM Name</label>
+				  </div>
+				  <div class="checkbox-inline">
+				    <label ><input type="checkbox" name="supplierIdChk" id="supplierIdChk" value="supplierId">Supplier ID:</label>
+				  </div>
+				  <div class="checkbox-inline">
+				    <label><input type="checkbox" name="supplierNameChk" id="supplierNameChk" value="supplierName">Supplier Name:</label>
+				  </div>
+				  <div class="checkbox-inline">
+				    <label><input type="checkbox" name="qtyChk" id="qtyChk" value="qty">Quantity</label>
+				  </div>
+				  <div class="checkbox">
+				    <label><input type="checkbox"> Remember me</label>
+				  </div>
+				  <button id="delSupplier" type="submit" class="btn btn-default">Delete</button>
+			</form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+        
+      </div> -->
+<!-- end of modal 2 -->      
+    </div>
+  </div>
+
 </div>
   
 </body>

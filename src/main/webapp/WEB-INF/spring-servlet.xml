@@ -5,13 +5,21 @@
     xmlns:context="http://www.springframework.org/schema/context"  
     xmlns:mvc="http://www.springframework.org/schema/mvc"
     xsi:schemaLocation="http://www.springframework.org/schema/beans  
-http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+http://www.springframework.org/schema/beans/spring-beans.xsd  
 http://www.springframework.org/schema/context  
-http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/context/spring-context.xsd
 http://www.springframework.org/schema/mvc
-http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"> 
+http://www.springframework.org/schema/mvc/spring-mvc.xsd"> 
 
-<context:component-scan base-package="result"/>
+<!-- <import resource="../../resources/BeanDefinitions.xml"/> -->
+
+<!-- component scan to enable the usage of @service @repository @controller-->
+<context:component-scan base-package="com.result.controller"/>
+<context:component-scan base-package="com.result.dataaccesslayer"/>
+<context:component-scan base-package="com.result.dataaccesslayer.user"/>
+<context:component-scan base-package="com.result.service"/>
+<context:component-scan base-package="com.result.businessLayer"/>
+<context:component-scan base-package="com.result.businessLayer.user"/>
 
 <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 <property name="prefix" value="/WEB-INF/views/"></property>
@@ -24,13 +32,21 @@ http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 <property name="username" value="root"></property>  
 <property name="password" value="admin"></property>  
 </bean>  
-  
+ 
+<!-- <bean
+class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>-->
+
+<!-- <bean id="user" class="com.result.businessLayer.user.User"></bean> 
+<bean id="resultSetExecutor" class="com.result.dataaccesslayer.user.UserResultSetExtractor"></bean> -->
+ 
 <bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">  
 <property name="dataSource" ref="ds"></property>  
 </bean>
-<bean id="dao" class="dataaccesslayer.DataConn">
+<bean id="dao" class="com.result.dataaccesslayer.DataConn">
 <property name="template" ref="jt"></property>
 </bean>
+
+
 
    <mvc:resources mapping = "/views/**" location = "/WEB-INF/views/" />
    <mvc:resources mapping = "/css/**" location = "/WEB-INF/css/" />
