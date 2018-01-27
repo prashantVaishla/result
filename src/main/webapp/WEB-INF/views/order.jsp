@@ -6,7 +6,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+        <script type = "text/javascript" src = "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
         <script src="js/dynamic_list_helper2.js" type="text/javascript"></script>
         <title>JSP Page</title>
     </head>
@@ -15,7 +16,7 @@
         <div style="border:1px solid #eaeaea;padding:20px;width:400px">
             ${message}
         </div>
-        <form:form action="${cp}/editpersonlistcontainer" modelAttribute="personListContainer" method="post" id="personListForm">
+        <form:form action="${pageContext.request.contextPath}/editpersonlistcontainer" modelAttribute="personListContainer" method="post" id="personListForm">
             <table>
                 <thead>
                     <tr>
@@ -28,9 +29,12 @@
                 <tbody id="personListContainer">
                     <c:forEach items="${personListContainer.productList}" var="Person" varStatus="i" begin="0" >
                         <tr class="person">    
-                            <td><form:input path="productList[${i.index}].productName" id="productName${i.index}" /></td>
                             <td><form:input path="productList[${i.index}].productId" id="productId${i.index}" /></td>
-                            <td><form:input path="productList[${i.index}].quantity" id="quantity${i.index}" /></td>
+                            <td><form:input path="productList[${i.index}].productName" id="productName${i.index}" /></td>
+                            <td>
+                            	<form:input path="productList[${i.index}].quantity" id="quantity${i.index}" />
+                            	<form:hidden path="productList[${i.index}].maxQuantity" id="maxQuantity${i.index}" />
+                            </td>
                             <td><form:input path="productList[${i.index}].price" id="price${i.index}" /></td>
                             <%--
                             <td><input type="text" name="personList[].name" value="${Person.name}" /></td>
@@ -69,6 +73,7 @@
             <input type="submit" value="Save" id="submit" />&nbsp;&nbsp;
             <a href="#" id="addPerson">Add Person</a>&nbsp;&nbsp;
             <a href="?f=">Reset List</a>
+            <h6>${errorMessage }</h6>
         </form:form>
  
         <script type="text/javascript">
@@ -106,12 +111,95 @@
                     formId : 'personListForm',
                     rowContainerId : 'personListContainer',
                     indexedPropertyName : 'productList',
-                    indexedPropertyMemberNames : 'productName,productId,quantity,price',
+                    indexedPropertyMemberNames : 'productId,productName,quantity,maxQuantity,price',
                     rowAddedListener : rowAdded,
                     rowRemovedListener : rowRemoved,
                     beforeSubmit : beforeSubmit
                 };
                 new DynamicListHelper(config);
+                
+                  $('#personListContainer').on('focusin', 'input[id^=\'productName\']', function(){
+                	   i = $(this).attr('id');
+                	   res = i.substring(11);
+                	   console.log(res);
+                    $(this).autocomplete({
+                    	minLength: 2,
+                        source: function( request, response ) {
+                            $.ajax({
+                                url: "${pageContext.request.contextPath}/getProductDetails",
+                                dataType: "json",
+                                data: { term: request.term },
+                                success: function( data ) {
+                                    response( $.map( data, function( item ) {
+                                        return {    label: item.productName, 
+                                                    value: item.productName, //value: item.route_name+', '+item.route_grade+', '+item.area_name, 
+                                                    id: item.productId,
+                                                    quantity: item.maxQuantity,
+                                                    price: item.price,
+                                                    // area_name: item.area_name,
+                                                    //sector_name: item.sector_name,
+                                                    //country_name: item.country_name
+                                                    }   
+                                    }));
+                                }
+                            });
+                        },
+                        select: function (event, ui) {
+                            $('#productName'+res).val(ui.item.value);
+                            $('#maxQuantity'+res).val(ui.item.quantity);
+                            $('#price'+res).val(ui.item.price);
+                            $('#productId'+res).val(ui.item.id);
+
+                            //var $radios = $('input:radio[name=route_type]');
+                            //if($radios.is(':checked') === false  && ui.item.route_type == 'route') {
+                            //    $radios.filter('[value=route]').prop('checked', true);
+                            //}
+                            //if($radios.is(':checked') === false  && ui.item.route_type == 'boulder') {
+                              //  $radios.filter('[value=boulder]').prop('checked', true);
+                            //}
+                            return false;
+},
+                    });
+                }); 
+                
+                /* $("#personListContainer :input[id^='productName']").autocomplete({
+                    minLength: 2,
+                    source: function( request, response ) {
+                        $.ajax({
+                            url: "${pageContext.request.contextPath}/getProductDetails",
+                            dataType: "json",
+                            data: { term: request.term },
+                            success: function( data ) {
+                                response( $.map( data, function( item ) {
+                                    return {    label: item.productName, 
+                                                value: item.productName, //value: item.route_name+', '+item.route_grade+', '+item.area_name, 
+                                                id: item.productId,
+                                                quantity: item.quantity,
+                                                price: item.price,
+                                                //area_name: item.area_name,
+                                                //sector_name: item.sector_name,
+                                                //country_name: item.country_name 
+                                                }   
+                                }));
+                            }
+                        });
+                    },
+                    select: function (event, ui) {
+                        $('#productName0').val(ui.item.value);
+                        $('#quantity0').val(ui.item.quantity);
+                        $('#price0').val(ui.item.price);
+                        $('#productId0').val(ui.item.id);
+
+                        // var $radios = $('input:radio[name=route_type]');
+                        //if($radios.is(':checked') === false  && ui.item.route_type == 'route') {
+                          //  $radios.filter('[value=route]').prop('checked', true);
+                        //}
+                        //if($radios.is(':checked') === false  && ui.item.route_type == 'boulder') {
+                          //  $radios.filter('[value=boulder]').prop('checked', true);
+                        //}
+                        return false;
+                    }
+                }); */
             });
         </script>
  

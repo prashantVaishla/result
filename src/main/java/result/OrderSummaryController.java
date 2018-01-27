@@ -55,7 +55,7 @@ public class OrderSummaryController {
 			System.out.println(s);
 			System.out.println("==" + httpServletRequest.getAttribute(s));
 		}
-		List<ConfirmationTO> listConfirmationTOs = new ArrayList<ConfirmationTO>();
+		/*List<ConfirmationTO> listConfirmationTOs = new ArrayList<ConfirmationTO>();
 		listConfirmationTOs
 				.add(new ConfirmationTO("Spring in Action", "Craig Walls", "1935182358", "June 29th 2011", 31.98F));
 		listConfirmationTOs.add(new ConfirmationTO("Spring in Practice", "Willie Wheeler, Joshua White", "1935182056",
@@ -63,9 +63,9 @@ public class OrderSummaryController {
 		listConfirmationTOs.add(
 				new ConfirmationTO("Pro Spring 3", "Clarence Ho, Rob Harrop", "1430241071", "April 18th 2012", 31.85F));
 		listConfirmationTOs.add(new ConfirmationTO("Spring Integration in Action", "Mark Fisher", "1935182439",
-				"September 26th 2012", 28.73F));
+				"September 26th 2012", 28.73F));*/
 		System.out.println("Calling generatePdf()...");
 		// return a view which will be resolved by an excel view resolver
-		return new ModelAndView("pdfView", "listConfirmationTOs", orderConfirmation.getPersonListContainer().getProductList());
+		return new ModelAndView("pdfView", "listConfirmationTOs", orderConfirmation);
 	}
 }

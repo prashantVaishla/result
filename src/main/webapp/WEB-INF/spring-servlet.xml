@@ -21,18 +21,18 @@ http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
         <property name="basename" value="views"/>
     </bean>
 
-	<!-- <bean id="ds"
+	<bean id="ds"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
-		<property name="url" value="jdbc:mysql://localhost:3307/test"></property>
-		<property name="username" value="root"></property>
-		<property name="password" value="admin"></property>
+		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"></property>
+		<property name="url" value="jdbc:derby:C:\\Users\\HP LAPTOP\\MyDB;create=true"></property>
+		<!-- <property name="username" value="sam"></property>
+		<property name="password" value="sam123456"></property> -->
 	</bean>
 
-	<bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="ds"></property>
 	</bean>
-	<bean id="dao" class="dataaccesslayer.DataConn">
+	<!-- <bean id="dao" class="dataaccesslayer.DataConn">
 		<property name="template" ref="jt"></property>
 	</bean> -->
 

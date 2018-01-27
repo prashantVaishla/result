@@ -35,6 +35,7 @@
 						<td>${Person.productName}</td><form:hidden path="personListContainer.productList[${i.index}].productName"/>
 						<td>${Person.productId}</td><form:hidden path="personListContainer.productList[${i.index}].productId"/>
 						<td>${Person.quantity}</td><form:hidden path="personListContainer.productList[${i.index}].quantity"/>
+						<form:hidden path="personListContainer.productList[${i.index}].maxQuantity"/>
 						<td>${Person.price}</td><form:hidden path="personListContainer.productList[${i.index}].price"/>
 						<br><form:hidden path="total"/>
 					</tr>

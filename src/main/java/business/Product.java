@@ -4,27 +4,36 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Entity
-/*@Table(name="product")*/
+/* @Table(name="product") */
 public class Product implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String productName;
 	@Id
-    private String productId;
-    private int quantity;
-    private double price;
- 
-    public Product() {
-    }
+	private String productId;
+	private int quantity;
+	private int maxQuantity;
+	private double price;
 
-	public Product(String productName, String productId, int quantity, double price) {
+	public Product() {
+	}
+
+	public Product(String productName, String productId, int quantity, int maxQuantity, double price) {
 		super();
 		this.productName = productName;
 		this.productId = productId;
 		this.quantity = quantity;
+		this.maxQuantity = maxQuantity;
 		this.price = price;
+	}
+
+	public int getMaxQuantity() {
+		return maxQuantity;
+	}
+
+	public void setMaxQuantity(int maxQuantity) {
+		this.maxQuantity = maxQuantity;
 	}
 
 	public String getProductName() {
@@ -58,5 +67,5 @@ public class Product implements Serializable {
 	public void setPrice(double price) {
 		this.price = price;
 	}
- 
+
 }

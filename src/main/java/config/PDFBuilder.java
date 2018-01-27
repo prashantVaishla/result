@@ -17,6 +17,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import business.ConfirmationTO;
+import business.OrderConfirmation;
 import business.Product;
 
 public class PDFBuilder extends AbstractITextPdfView {
@@ -25,13 +26,13 @@ public class PDFBuilder extends AbstractITextPdfView {
 	protected void buildPdfDocument(Map<String, Object> model, Document doc, PdfWriter writer,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// get data model which is passed by the Spring container
-		List<Product> listConfirmationTOs = (List<Product>) model.get("listConfirmationTOs");
+		OrderConfirmation orderConfirmation = (OrderConfirmation) model.get("listConfirmationTOs");
 
-		doc.add(new Paragraph("Recommended books for Spring framework"));
+		doc.add(new Paragraph("Invoice Details"));
 
-		PdfPTable table = new PdfPTable(5);
+		PdfPTable table = new PdfPTable(4);
 		table.setWidthPercentage(100.0f);
-		table.setWidths(new float[] { 3.0f, 2.0f, 2.0f, 2.0f, 1.0f });
+		table.setWidths(new float[] { 3.0f, 2.0f, 2.0f, 2.0f });
 		table.setSpacingBefore(10);
 
 		// define font for table header row
@@ -60,7 +61,7 @@ public class PDFBuilder extends AbstractITextPdfView {
 		table.addCell(cell);*/
 
 		// write table row data
-		for (Product aConfirmationTO : listConfirmationTOs) {
+		for (Product aConfirmationTO : orderConfirmation.getPersonListContainer().getProductList()) {
 			table.addCell(aConfirmationTO.getProductId());
 			table.addCell(aConfirmationTO.getProductName());
 			table.addCell(Double.toString(aConfirmationTO.getPrice()));
@@ -68,6 +69,7 @@ public class PDFBuilder extends AbstractITextPdfView {
 		}
 
 		doc.add(table);
+		doc.add(new Paragraph("Total:" + orderConfirmation.getTotal()));
 
 	}
 

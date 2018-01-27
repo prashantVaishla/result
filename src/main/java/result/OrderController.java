@@ -46,7 +46,7 @@ public class OrderController {
 	public ModelAndView editpersonListContainer(@ModelAttribute ProductListContainer personListContainer,
 			BindingResult bindingResult, ModelMap modelMap, HttpServletRequest httpServletRequest,
 			HttpSession httpSession, final RedirectAttributes redirectAttributes) {
-		System.out.println("--- Model data ---");
+		/*System.out.println("--- Model data ---");
 		for (Object modelKey : modelMap.keySet()) {
 			Object modelValue = modelMap.get(modelKey);
 			System.out.println(modelKey + " -- " + modelValue);
@@ -66,11 +66,19 @@ public class OrderController {
 			String s = e.nextElement();
 			System.out.println(s);
 			System.out.println("**" + httpSession.getAttribute(s));
-		}
+		}*/
 		int qty = 0;
 		double price = 0.0;
 		double total = 0;
+		ModelAndView andView = new  ModelAndView();
 		for (Product p : personListContainer.getProductList()) {
+			if (p.getQuantity() > p.getMaxQuantity()) {
+				andView.setViewName("order.jsp");
+				andView.addObject("personListContainer", personListContainer);
+				andView.addObject("errorMessage", p.getProductName() + "  exceeded inventory size");
+				return andView;
+			}
+				
 			total += p.getPrice() * p.getQuantity();
 			System.out.println("Name: " + p.getProductName());
 			// System.out.println("Age: " + p.getAge());
@@ -78,7 +86,7 @@ public class OrderController {
 		OrderConfirmation confirmation = new OrderConfirmation(personListContainer, total);
 		httpSession.setAttribute("personListContainer", personListContainer);
 		//redirectAttributes.addFlashAttribute("orderConfirmation", confirmation);
-		ModelAndView andView = new  ModelAndView();
+		
 		andView.setViewName("orderConfirmation.jsp");
 		andView.addObject("orderConfirmation", confirmation);
 		return andView;
@@ -92,8 +100,8 @@ public class OrderController {
 
 	private ProductListContainer getDummyPersonListContainer() {
 		List<Product> personList = new ArrayList<Product>();
-		for (int i = 0; i < 5; i++) {
-			personList.add(new Product("Person Name [" + i + "]", String.valueOf(i), i, i));
+		for (int i = 0; i < 1; i++) {
+			personList.add(new Product("Person Name [" + i + "]", String.valueOf(i), i, i, i));
 		}
 		return new ProductListContainer(personList);
 	}
